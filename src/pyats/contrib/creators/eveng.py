@@ -31,7 +31,7 @@ class Eveng(TestbedCreator):
 
         """
         return {
-            'required': ['eveng_url', 'eveng_user','eveng_password'],
+            'required': ['eveng_url', 'eveng_user'],
             'optional': {
                 'encode_password': False,
                 'topology': False,
@@ -51,18 +51,21 @@ class Eveng(TestbedCreator):
         return self.password
 
 
-    def _admin_login(self,eveng_url,eveng_user,eveng_password):
+    def _admin_login(self,eveng_url,eveng_user):
         """This function handles the login to the EVE-NG
             server
         """
-        self.login_dict.update(self._eveng_user)
-        self.login_dict.update(self._get_password())
+        login_dict = {}
+        
+        login_dict.update(self._eveng_user)
+        login_dict.update(self._get_password())
         console_dict = {"html5": "-1"}  #This will let us login with the Native console
-        self.login_dict.update(console_dict)
+        login_dict.update(console_dict)
+
         login_url = "api/auth/login"
 
         try:                                #Here we are passing in the Server ip
-            req = Request('POST',F"{eveng_url}{login_url}" , data = (json.dumps(self.login_dict)))
+            req = Request('POST',F"{eveng_url}{login_url}" , data = (json.dumps(login_dict)))
             #self.cookies.update(req.cookies.get_dict())
 
             prepped = self.session.prepare_request(req)
@@ -73,6 +76,7 @@ class Eveng(TestbedCreator):
         except requests.exceptions.HTTPError as e:
             raise SystemExit(e)
             sys.exit(1)
+            return None
 
         return respone
 
